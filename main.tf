@@ -2,14 +2,12 @@ provider "aws" {
   region = local.region
 }
 
-resource "aws_s3_bucket" "test_bucket" {
-  bucket = "isaac-terraform-test-bucket-${random_id.suffix.hex}"
+module "api_gateway" {
+  source              = "./modules/api_gateway"
+  name                = var.api_name
+  lambda_function_arn = "arn:aws:lambda:us-east-1:905418449434:function:Test"
+  region              = var.region
   tags = {
-    Name        = "Terraform Test Bucket"
-    Environment = "Test"
+    Environment = "dev"
   }
-}
-
-resource "random_id" "suffix" {
-  byte_length = 4
 }
