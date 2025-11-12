@@ -1,3 +1,3 @@
-output "bucket_name" {
-  value = aws_s3_bucket.test_bucket.bucket
+output "api_endpoint" {
+  value = module.api_gateway.api_endpoint
 }
