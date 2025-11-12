@@ -1,7 +1,7 @@
 site_name: Library Request System
 site_description: Serverless application for managing book requests using AWS Lambda, SQS, and DynamoDB.
 site_author: Isaac Luisjuan
-repo_url: https://github.com/isaacluisjuan/library-request-system
+repo_url: https://github.com/sierraCode397/library-request-system
 theme:
   name: material
   palette:

@@ -1,1 +1,0 @@
-# Terraform main file placeholder
