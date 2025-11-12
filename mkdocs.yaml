@@ -1,0 +1,31 @@
+site_name: Library Request System
+site_description: Serverless application for managing book requests using AWS Lambda, SQS, and DynamoDB.
+site_author: Isaac Luisjuan
+repo_url: https://github.com/isaacluisjuan/library-request-system
+theme:
+  name: material
+  palette:
+    primary: blue
+    accent: light blue
+  features:
+    - navigation.expand
+    - search.suggest
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Architecture:
+      - Overview: architecture/overview.md
+      - AWS Components: architecture/aws_components.md
+  - Application:
+      - Producer Lambda: application/producer_lambda.md
+      - Consumer Lambda: application/consumer_lambda.md
+  - Infrastructure:
+      - Terraform Setup: infrastructure/terraform_setup.md
+      - IAM Roles: infrastructure/iam_roles.md
+  - Deployment:
+      - CI/CD Pipeline: deployment/pipeline.md
+      - Testing: deployment/testing.md
+  - Documentation:
+      - Setup Guide: docs/setup_guide.md
+      - Troubleshooting: docs/troubleshooting.md
