@@ -4,4 +4,4 @@ Welcome to the documentation.
 
 Architecture 1
 
-Testing pipeline
+Testing pipeline [2]
