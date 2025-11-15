@@ -2,7 +2,7 @@ name: Deploy MkDocs to Vercel (only on docs changes)
 
 on:
   push:
-    branches: ["main"]
+    branches: ["main", "develop"]
     paths:
       - "docs/**"
       - "mkdocs.yml"
@@ -17,6 +17,30 @@ on:
   workflow_dispatch:
 
 jobs:
+  cleanup-artifacts:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete old artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const maxToKeep = 5;
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+
+            const oldArtifacts = artifacts.data.artifacts.slice(maxToKeep);
+
+            for (const artifact of oldArtifacts) {
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id
+              });
+              console.log(`Deleted artifact: ${artifact.name}`);
+            }
+
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
@@ -52,7 +76,7 @@ jobs:
             echo "No site/ directory found — nothing to deploy."
             exit 0
           fi
-          
+
       - name: Set commit status to success
         if: success()
         uses: actions/github-script@v7
