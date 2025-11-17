@@ -8,12 +8,6 @@ variable "protocol_type" {
   default = "HTTP"
 }
 
-# full lambda function ARN, e.g. arn:aws:lambda:us-east-1:123456789012:function:my-fn
-variable "lambda_function_arn" {
-  type        = string
-  description = "ARN of the Lambda function to integrate with the API (required)"
-}
-
 variable "region" {
   type    = string
   default = "us-east-1"
@@ -27,4 +21,14 @@ variable "stage_name" {
 variable "tags" {
   type    = map(string)
   default = {}
+}
+
+variable "producer_lambda_arn" {
+  type        = string
+  description = "ARN of the producer Lambda function"
+}
+
+variable "consumer_lambda_arn" {
+  type        = string
+  description = "ARN of the consumer Lambda function"
 }
