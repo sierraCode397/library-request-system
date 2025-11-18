@@ -48,9 +48,9 @@ module "iam" {
   source = "./modules/iam"
 
   name_prefix        = "simple-lib"
-  producer_sqs_arn   = module.sqs.queue_arn        # <-- asegurate que module.sqs exporte queue_arn
+  producer_sqs_arn   = module.sqs.queue_arn       
   consumer_sqs_arn   = module.sqs.queue_arn
-  dynamodb_table_arn = module.dynamodb.table_arn   # <-- asegurate que module.dynamodb exporte table_arn
+  dynamodb_table_arn = module.dynamodb.table_arn  
 
   tags = {
     project = "simple-lambdas"
@@ -64,10 +64,11 @@ module "iam" {
 module "simple_lambdas" {
   source = "./modules/lambdas"
 
-  producer_zip_path = "${path.module}/lambda/producer.zip"
-  consumer_zip_path = "${path.module}/lambda/consumer.zip"
+  producer_zip_path   = "${path.module}/lambda/producer/producer.zip"
+  consumer_zip_path   = "${path.module}/lambda/consumer/consumer.zip"
 
-  sqs_queue_url     = module.sqs.queue_url
+  sqs_queue_url       = module.sqs.queue_url
+  sqs_queue_arn       = module.sqs.queue_arn
   dynamodb_table_name = module.dynamodb.table_name
 
   producer_role_arn = module.iam.producer_role_arn
@@ -86,13 +87,10 @@ module "simple_lambdas" {
 module "api_gateway" {
   source = "./modules/api_gateway"
 
-  name                 = var.api_name
-  region               = var.region
-
-  # el API invoca la lambda producer: se necesita el ARN de la lambda
-  producer_lambda_arn  = module.simple_lambdas.producer_lambda_arn
-  consumer_lambda_arn  = module.simple_lambdas.consumer_lambda_arn
-
+  name                = var.api_name
+  region              = var.region
+  producer_lambda_arn = module.simple_lambdas.producer_lambda_arn
+  consumer_lambda_arn = module.simple_lambdas.consumer_lambda_arn
   tags = {
     Environment = "dev"
   }

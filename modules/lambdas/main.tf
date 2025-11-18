@@ -37,3 +37,11 @@ resource "aws_lambda_function" "consumer" {
     )
   }
 }
+
+# --- Event Source Mapping ---
+resource "aws_lambda_event_source_mapping" "consumer_sqs" {
+  event_source_arn = var.sqs_queue_arn
+  function_name    = aws_lambda_function.consumer.arn
+  enabled          = true
+  batch_size       = 5
+}
