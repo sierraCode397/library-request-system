@@ -27,3 +27,9 @@ variable "tags" {
   type    = map(string)
   default = {}
 }
+
+variable "sqs_queue_url" {
+  type        = string
+  description = "SQS queue URL to be injected into the producer lambda (optional)"
+  default     = ""
+}
