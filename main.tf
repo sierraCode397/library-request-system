@@ -39,3 +39,25 @@ module "sqs" {
   }
 }
 
+module "dynamodb" {
+  source = "./modules/dynamodb"
+
+  name         = "books-table"
+  billing_mode = "PAY_PER_REQUEST"
+
+  hash_key  = "pk"
+  range_key = "" # no sort key, puedes poner "sk" si quieres
+
+  attributes = [
+    { name = "pk", type = "S" }
+  ]
+
+  stream_enabled         = false
+  ttl_enabled            = false
+  point_in_time_recovery = true
+
+  tags = {
+    project = "simple-lambdas"
+    owner   = "isaac"
+  }
+}
