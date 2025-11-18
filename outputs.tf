@@ -9,3 +9,11 @@ output "sqs_queue_url" {
 output "dynamodb_table_id" {
   value = module.dynamodb.table_id
 }
+
+output "consumer_policy_arn" {
+  value = module.iam.consumer_policy_arn
+}
+
+output "producer_policy_arn" {
+  value = module.iam.producer_policy_arn
+}
