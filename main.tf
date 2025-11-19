@@ -61,6 +61,7 @@ module "iam" {
 # -----------------------
 # 4) Lambdas (usa role ARNs y queue URL)
 # -----------------------
+
 module "simple_lambdas" {
   source = "./modules/lambdas"
 
@@ -78,8 +79,10 @@ module "simple_lambdas" {
     project = "simple-lambdas"
     owner   = "isaac"
   }
-}
 
+  # opcional: asegurarte de que cloudwatch exista antes de crear lambdas
+  depends_on = [module.cloudwatch]
+}
 
 # -----------------------
 # 5) API Gateway (invoca producer lambda)
@@ -93,5 +96,16 @@ module "api_gateway" {
   consumer_lambda_arn = module.simple_lambdas.consumer_lambda_arn
   tags = {
     Environment = "dev"
+  }
+}
+
+module "cloudwatch" {
+  source = "./modules/cloudwatch"
+
+  lambda_names = ["producer-simple", "consumer-simple"]
+  retention_in_days = 14
+  tags = {
+    project = "simple-lambdas"
+    owner   = "isaac"
   }
 }
