@@ -22,9 +22,10 @@ pipeline {
         stage('Configure AWS CLI and Test') {
             steps {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY', credentialsId: 'AWS-Access-Keys')]) {
-                    sh '''
-                        aws ec2 describe-instances
-                    '''
+                    script{
+                        terraform init
+                        terraform plan
+                    }
                 }
             }
         }
