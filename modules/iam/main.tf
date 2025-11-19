@@ -40,6 +40,19 @@ resource "aws_iam_role_policy" "producer_policy" {
         ]
         Resource = var.producer_sqs_arn
       },
+
+      # DynamoDB read permissions (para GET /producer)
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:Scan",
+          "dynamodb:Query",
+          "dynamodb:GetItem",
+          "dynamodb:DescribeTable"
+        ]
+        Resource = var.dynamodb_table_arn
+      },
+
       {
         Effect = "Allow"
         Action = [
@@ -52,6 +65,7 @@ resource "aws_iam_role_policy" "producer_policy" {
     ]
   })
 }
+
 
 # --- Consumer Role ---
 resource "aws_iam_role" "consumer" {

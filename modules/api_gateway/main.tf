@@ -1,3 +1,5 @@
+data "aws_caller_identity" "current" {}
+
 resource "aws_apigatewayv2_api" "this" {
   name          = var.name
   protocol_type = var.protocol_type
@@ -33,41 +35,11 @@ resource "aws_lambda_permission" "producer_permission" {
   action        = "lambda:InvokeFunction"
   function_name = var.producer_lambda_arn
   principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.this.execution_arn}/*/*"
+
+  # Use execution_arn with account / api id + wildcard for stages/methods.
+  # This is robust for v2 APIs.
+  source_arn = "${aws_apigatewayv2_api.this.execution_arn}/*/*"
 }
-
-# -------------------------------
-# Consumer Integration
-# -------------------------------
-resource "aws_apigatewayv2_integration" "consumer_integration" {
-  api_id                 = aws_apigatewayv2_api.this.id
-  integration_type       = "AWS_PROXY"
-  integration_method     = "POST"
-  payload_format_version = "2.0"
-
-  integration_uri = "arn:aws:apigateway:${var.region}:lambda:path/2015-03-31/functions/${var.consumer_lambda_arn}/invocations"
-}
-
-resource "aws_apigatewayv2_route" "consumer_route_post" {
-  api_id    = aws_apigatewayv2_api.this.id
-  route_key = "POST /consumer"
-  target    = "integrations/${aws_apigatewayv2_integration.consumer_integration.id}"
-}
-
-resource "aws_apigatewayv2_route" "consumer_route_get" {
-  api_id    = aws_apigatewayv2_api.this.id
-  route_key = "GET /consumer"
-  target    = "integrations/${aws_apigatewayv2_integration.consumer_integration.id}"
-}
-
-resource "aws_lambda_permission" "consumer_permission" {
-  statement_id  = "AllowConsumerInvocation"
-  action        = "lambda:InvokeFunction"
-  function_name = var.consumer_lambda_arn
-  principal     = "apigateway.amazonaws.com"
-  source_arn    = "${aws_apigatewayv2_api.this.execution_arn}/*/*"
-}
-
 # -------------------------------
 # Stage
 # -------------------------------

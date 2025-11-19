@@ -77,3 +77,14 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "sqs_queue_arn" {
+  type        = string
+  description = "ARN of the SQS queue for consumer"
+}
+
+variable "consumer_lambda_arn" {
+  type        = string
+  description = "Optional: ARN of consumer Lambda if needed externally"
+  default     = null
+}
