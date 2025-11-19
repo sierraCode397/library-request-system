@@ -1,11 +1,11 @@
-# Cola DLQ
+# Dead-Letter Queue (DLQ)
 resource "aws_sqs_queue" "dlq" {
   name = "${var.queue_name}-dlq"
-  message_retention_seconds = 1209600 # 14 días
+  message_retention_seconds = 259200
   tags = var.tags
 }
 
-# Cola principal
+# Main SQS Queue
 resource "aws_sqs_queue" "this" {
   name = var.queue_name
 
@@ -13,6 +13,5 @@ resource "aws_sqs_queue" "this" {
     deadLetterTargetArn = aws_sqs_queue.dlq.arn
     maxReceiveCount     = 5
   })
-
   tags = var.tags
 }
