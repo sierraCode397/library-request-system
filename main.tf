@@ -2,6 +2,14 @@ provider "aws" {
   region = local.region
 }
 
+terraform {
+  backend "s3" {
+    bucket = "library-epam-cloud-platform"
+    key    = "terraform.tfstate"
+    region = "us-east-1"
+  }
+}
+
 module "sqs" {
   source = "./modules/sqs"
   queue_name        = "books-queue"
