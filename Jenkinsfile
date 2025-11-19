@@ -4,6 +4,9 @@ pipeline {
     options {
         buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
     }
+    environment {
+        AWS_DEFAULT_REGION = 'us-east-1'
+    }
     stages {
         stage('Test Webhook: Checkout Branch') {
             steps {
@@ -20,8 +23,7 @@ pipeline {
             steps {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY', credentialsId: 'aws-credentials-id')]) {
                     sh '''
-                        terraform init
-                        terraform plan
+                        aws ec2 describe-instances
                     '''
                 }
             }
