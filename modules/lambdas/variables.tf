@@ -11,13 +11,13 @@ variable "consumer_zip_path" {
 variable "producer_function_name" {
   description = "Name for the producer lambda function"
   type        = string
-  default     = "producer-simple"
+  default     = "producer-function"
 }
 
 variable "consumer_function_name" {
   description = "Name for the consumer lambda function"
   type        = string
-  default     = "consumer-simple"
+  default     = "consumer-function"
 }
 
 variable "producer_handler" {

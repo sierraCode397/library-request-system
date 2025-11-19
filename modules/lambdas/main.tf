@@ -9,7 +9,6 @@ resource "aws_lambda_function" "producer" {
   timeout          = var.lambda_timeout
   source_code_hash = filebase64sha256(var.producer_zip_path)
   tags             = var.tags
-
 environment {
   variables = merge(
     {},
@@ -30,7 +29,6 @@ resource "aws_lambda_function" "consumer" {
   timeout          = var.lambda_timeout
   source_code_hash = filebase64sha256(var.consumer_zip_path)
   tags             = var.tags
-
   environment {
     variables = merge(
       {},

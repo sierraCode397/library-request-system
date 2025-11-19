@@ -1,16 +1,15 @@
 data "aws_iam_policy_document" "lambda_assume_role" {
   statement {
     effect = "Allow"
-
     principals {
       type        = "Service"
       identifiers = ["lambda.amazonaws.com"]
     }
-
     actions = ["sts:AssumeRole"]
   }
 }
 
+# --- Producer Role ---
 resource "aws_iam_role" "producer" {
   name               = "${var.name_prefix}-producer-lambda-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
@@ -27,10 +26,10 @@ resource "aws_iam_role_policy_attachment" "producer_basic" {
 resource "aws_iam_role_policy" "producer_policy" {
   name = "${var.name_prefix}-producer-inline-policy"
   role = aws_iam_role.producer.id
-
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
+      # SQS permissions
       {
         Effect = "Allow"
         Action = [
@@ -40,8 +39,7 @@ resource "aws_iam_role_policy" "producer_policy" {
         ]
         Resource = var.producer_sqs_arn
       },
-
-      # DynamoDB read permissions (para GET /producer)
+      # DynamoDB read permissions (GET /producer)
       {
         Effect = "Allow"
         Action = [
@@ -52,7 +50,7 @@ resource "aws_iam_role_policy" "producer_policy" {
         ]
         Resource = var.dynamodb_table_arn
       },
-
+      # CloudWatch logs
       {
         Effect = "Allow"
         Action = [
@@ -66,7 +64,6 @@ resource "aws_iam_role_policy" "producer_policy" {
   })
 }
 
-
 # --- Consumer Role ---
 resource "aws_iam_role" "consumer" {
   name               = "${var.name_prefix}-consumer-lambda-role"
@@ -79,11 +76,9 @@ resource "aws_iam_role_policy_attachment" "consumer_basic" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# Consumer inline policy (SQS receive/delete + DynamoDB write/read)
 resource "aws_iam_role_policy" "consumer_policy" {
   name = "${var.name_prefix}-consumer-inline-policy"
   role = aws_iam_role.consumer.id
-
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -98,7 +93,6 @@ resource "aws_iam_role_policy" "consumer_policy" {
         ]
         Resource = var.consumer_sqs_arn
       },
-
       # DynamoDB permissions
       {
         Effect = "Allow"
@@ -111,7 +105,6 @@ resource "aws_iam_role_policy" "consumer_policy" {
         ]
         Resource = var.dynamodb_table_arn
       },
-
       # CloudWatch logs
       {
         Effect = "Allow"
