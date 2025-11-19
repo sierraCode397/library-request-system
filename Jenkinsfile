@@ -1,6 +1,5 @@
 pipeline {
     agent { label 'worker-agents-main' }
-
     options {
         buildDiscarder(logRotator(numToKeepStr: '10', artifactNumToKeepStr: '5'))
     }
@@ -8,7 +7,7 @@ pipeline {
         AWS_DEFAULT_REGION = 'us-east-1'
     }
     stages {
-        stage('Test Webhook: Checkout Branch') {
+        stage('Checkout Branch') {
             steps {
                 echo "Webhook triggered for a push event!"
                 echo "Build Number: #${env.BUILD_NUMBER}"
@@ -19,12 +18,35 @@ pipeline {
                 sh 'ls -la'
             }
         }
-        stage('Configure AWS CLI and Test') {
+        stage('Terraform Init') {
             steps {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY', credentialsId: 'AWS-Access-Keys')]) {
                     sh '''
-                        terraform init
-                        terraform plan
+                        set -e
+                        terraform init -input=false
+                    '''
+                }
+            }
+        }
+        stage('Terraform Plan') {
+            steps {
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY', credentialsId: 'AWS-Access-Keys')]) {
+                    sh '''
+                        set -e
+                        terraform plan -input=false -out=tfplan.binary
+                    '''
+                }
+            }
+        }
+        stage('Terraform Apply') {
+            when {
+                branch 'main'
+            }
+            steps {
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY', credentialsId: 'AWS-Access-Keys')]) {
+                    sh '''
+                        set -e
+                        terraform apply -input=false -auto-approve tfplan.binary
                     '''
                 }
             }
@@ -36,10 +58,10 @@ pipeline {
             cleanWs()
         }
         success {
-            echo " Webhook test pipeline SUCCEEDED."
+            echo "Webhook test pipeline SUCCEEDED."
         }
         failure {
-            echo " Webhook test pipeline FAILED. Check Jenkins logs and webhook configuration."
+            echo "Webhook test pipeline FAILED. Check Jenkins logs and webhook configuration."
         }
     }
 }
