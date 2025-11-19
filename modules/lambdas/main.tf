@@ -10,12 +10,13 @@ resource "aws_lambda_function" "producer" {
   source_code_hash = filebase64sha256(var.producer_zip_path)
   tags             = var.tags
 
-  environment {
-    variables = merge(
-      {},
-      var.sqs_queue_url != "" ? { SQS_URL = var.sqs_queue_url } : {}
-    )
-  }
+environment {
+  variables = merge(
+    {},
+    var.sqs_queue_url != "" ? { SQS_URL = var.sqs_queue_url } : {},
+    var.dynamodb_table_name != "" ? { DYNAMODB_TABLE = var.dynamodb_table_name } : {}
+  )
+}
 }
 
 # --- Consumer Lambda ---

@@ -6,6 +6,10 @@ output "sqs_queue_url" {
   value = module.sqs.queue_url
 }
 
+output "sqs_dlq_url" {
+  value = module.sqs.dlq_url
+}
+
 output "dynamodb_table_id" {
   value = module.dynamodb.table_id
 }

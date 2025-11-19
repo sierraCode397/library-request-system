@@ -6,8 +6,11 @@ provider "aws" {
 # 1) SQS (prerequisito)
 # -----------------------
 module "sqs" {
-  source     = "./modules/sqs"
-  queue_name = "books-queue"
+  source = "./modules/sqs"
+
+  queue_name        = "books-queue"
+  dlq_name          = "books-queue-dlq"
+  max_receive_count = 5
 
   tags = {
     project = "simple-lambdas"
