@@ -3,6 +3,5 @@
 .terraform.lock.hcl
 terraform.tfstate
 terraform.tfstate.backup
-*.zip
 lambda_build/
 **/lambda_build/
