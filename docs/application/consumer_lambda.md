@@ -1,41 +1,57 @@
-# Consumer_lambda
+# Consumer_Lambda Documentation
 
-## 1. Summary
+## Overview
 
-`consumer_lambda` is an AWS Lambda function that consumes messages (typically from SQS), enriches book metadata using the Open Library API, and persists the final processed record into a DynamoDB table. It expects an event containing records where each `body` holds the book payload.
-
----
-
-## 2. Purpose
-
-* Enrich book metadata such as title, authors, publication year, and ISBN by calling Open Library.
-* Store the enriched output in DynamoDB with a predictable primary key.
-* Tolerate partial or missing data without failing.
+The **consumer Lambda** processes incoming messages from an SQS queue and executes business logic based on the content of each message.
 
 ---
 
-## 3. Requirements & Dependencies
+## Purpose
 
-* Python 3.9+ (or the AWS Lambda runtime version you choose).
-* Libraries: `boto3`, `requests` (must be packaged in the deployment artifact or provided via Lambda Layers).
-
----
-
-## 4. Environment Variables
-
-* **`TABLE_NAME`** (required): Name of the DynamoDB table where records will be written.
-
-An exception is thrown at startup if this variable is missing.
+This Lambda is responsible for consuming queued events and transforming, validating, or forwarding the processed data to internal application services.
 
 ---
 
-## 5. Required AWS Resources & IAM
+## Architecture
 
-### Resources
+* **Trigger:** SQS Queue.
+* **Execution:** Each message triggers the Lambda.
+* **Downstream Services:** May call internal APIs or store data in a database.
+* **Dependencies:** AWS SDK, internal helper modules.
 
-* AWS Lambda function `consumer_lambda`.
-* DynamoDB table (referenced by `TABLE_NAME`).
-* SQS queue or other producer invoking this Lambda.
+---
+
+## Flow
+
+1. Lambda receives an event from SQS.
+2. Parses the message body.
+3. Executes validation and business rules.
+4. Sends processed results to the next service.
+5. Deletes the message if processed successfully.
+
+---
+
+## IAM Permissions
+
+* Read messages from SQS.
+* Write logs to CloudWatch.
+* Call internal services via API Gateway.
+
+---
+
+## Error Handling
+
+* Automatic retries handled by SQS.
+* Failed messages are redirected to a DLQ.
+
+---
+
+## Logging & Monitoring
+
+* Logs written to CloudWatch.
+* Metrics for invocation count and failures.
+
+---
 
 ### Minimum IAM Permissions
 
@@ -76,36 +92,3 @@ An exception is thrown at startup if this variable is missing.
       }
     ]
 ```
-
-## 6. Expected Input (Event Payload)
-
-The Lambda expects an event with `Records`, each similar to SQS format:
-
-```json
-{
-  "Records": [
-    {
-      "messageId": "...",
-      "body": "{ \"book\": { \"title\": \"...\", \"author\": \"...\" } }"
-    }
-  ]
-}
-```
-
-`body` may contain:
-
-* A JSON object with a `book` key, or
-* A book object directly.
-
----
-
-## 8. Key Functions
-
-* **`http_get_json(url, ...)`**: Wrapper around `requests.get()` + `.raise_for_status()` + `.json()`.
-* **`_authors_from_obj(o)`**: Extracts author names from varying Open Library structures.
-* **`enrich_book(book)`**: Performs metadata enrichment via Open Library (ISBN first, fallback to search).
-* **`handle_record(record)`**: Orchestrates parsing, enrichment, normalization, and persistence.
-* **`lambda_handler(event, context)`**: Main entry point that processes all incoming records.
-
----
-
