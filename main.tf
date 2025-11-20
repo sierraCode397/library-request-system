@@ -72,7 +72,7 @@ module "api_gateway" {
 module "cloudwatch" {
   source = "./modules/cloudwatch"
   lambda_names = ["producer-function", "consumer-function"]
-  retention_in_days = 14
+  retention_in_days = 3
   tags = {
     project = "library-epam"
     owner   = "isaac"
